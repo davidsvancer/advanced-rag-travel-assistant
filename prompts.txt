@@ -1,0 +1,95 @@
+Author: David Švancer (xsvancd00)
+
+Tento soubor obsahuje přesná zadání (prompty), která byla využita pro generování datasetu pro FAQ a RAGAS modelem ChatGPT. 
+
+1. Generování realistických dotazů a odpovědí pro dataset často kladených otázek cestovní kanceláře(FAQ).
+
+Použitý prompt:
+You are an expert content creator for a travel agency. Your task is to generate realistic, domain-specific Frequently Asked Questions (FAQs) along with professional answers.
+
+Generate a dataset of FAQs divided into core travel agency categories such as:
+- Booking and Cancellation Policies
+- Luggage Limits and Restrictions
+- Travel Insurance and Medical Coverage
+- Flight and Transport Logistics
+- Payment Methods and Deadlines
+
+Output strictly in a structured CSV format with columns: question;answer;category. Ensure the tone is formal, helpful, and mirrors actual customer service interactions. Do not include introductory text.
+
+2. Nejprve bylo vygenerováno 90 otázek, vzhledem k tomu, že se dataset ukázal jako malý, bylo dogenerováno dalších 220 otázek.
+
+2.1.
+Python-Verified RAG Golden Dataset 
+
+Step 1: Data Inspection & Setup
+Use Python (pandas) to load weaviate_data.csv.
+Identify the columns for Property Name, Description, Amenities, Price, and Reviews.
+Sample a diverse set of rows to generate the required 90 distinct questions.
+
+Step 2: Execution Logic (MUST follow this algorithm in Python)
+For each category, you must use Python to verify factual correctness and uniqueness in the dataset BEFORE writing the question.
+
+Step 3: Category Specifics (Total: 90 samples)
+
+BASIC (50 samples): Formulate direct, unambiguous factual retrieval queries. Extract concrete structured or unstructured facts from descriptions, amenities, or pricing (e.g., exact distances, specific house rules, distinct room configurations, or explicit pricing details). The question asks directly for this verifiable fact.
+
+VAGUE (10 samples): Find a unique subjective experience or atmosphere described in guest reviews. Describe the feeling or vibe without using exact keyword matching.
+
+NEGATION (10 samples): Find a property that explicitly lacks a specific amenity or enforces a strict restriction (e.g., "no parking available", "shared bathroom only"). The question must test logical exclusion (e.g., "Which property does NOT offer...").
+
+MULTIHOP (10 samples): Use Python to identify rows where a structured attribute (like property type or specific location) can be logically combined with a distinct detail mentioned inside the reviews.
+
+FALSE PREMISE (10 samples): Use real property names from the dataset but query them about completely fabricated features or non-existent services. The ground truth MUST strictly be: "I'm sorry, but this information is not available in the provided data."
+
+Step 4: Output Format (Strict CSV)
+Output exactly in this format. Use double quotes for every field.
+
+structure:
+"question","ground_truth","category","property_name"
+
+CRITICAL CONSTRAINTS:
+
+NO HALLUCINATIONS: Every statement in the ground_truth must be strictly grounded and verifiable in weaviate_data.csv using Python.
+
+FORMAT CONSISTENCY: Ensure strict adherence to the CSV structure so this output can be seamlessly concatenated with existing dataset batches.
+
+Please start by using Python to inspect the data and execute the generation.
+
+2.2.
+Python-Verified RAG Golden Dataset
+
+Step 1: Data Inspection & Setup
+Use Python (pandas) to load weaviate_data.csv.
+
+Identify the columns for Property Name, Description, and Reviews (or the combined text column).
+
+Randomly sample 150-200 rows to ensure enough variety for the 220 questions.
+
+Step 2: Execution Logic (MUST follow this algorithm in Python)
+For each category, you must use Python to verify uniqueness BEFORE writing the question.
+
+Step 3: Category Specifics (Total: 220 samples)
+
+VAGUE (60 samples): Find a unique subjective experience in reviews. Describe the feeling or vibe without using the unique keywords.
+
+NEGATION (60 samples): Find a property that explicitly lacks something (e.g., "no elevator", "no pets", "kitchen without a stove"). The question must ask "Which property does NOT have...".
+
+MULTIHOP (60 samples): Use Python to find a row where you can combine a structured fact (like property type or a specific price mentioned) with a unique review detail.
+
+FALSE PREMISE (40 samples): Use a real property name from the file. Attach a fake, non-existent attribute. Ground truth MUST be: "I'm sorry, but this information is not available in the provided data."
+
+Step 4: Output Format (Strict CSV)
+Output exactly in this format. Use double quotes for every field.
+
+structure:
+"question","ground_truth","category","property_name"
+
+CRITICAL CONSTRAINTS:
+
+NO HALLUCINATIONS: Every fact in the ground_truth must be verifiable in weaviate_data.csv using Python.
+
+UNIQUE ANCHORS: No anchor phrase (like "clean and comfortable") can be used if it appears in more than 1 row.
+
+Please start by using Python to inspect the columns of weaviate_data.csv and begin
+
+
